@@ -2,8 +2,9 @@
 #include <ESPAsyncWebSrv.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <ESP32Servo.h>
+#include <ESP32Servo.h>
 
+Servo myServo;
 
 // Replace with your network credentials
 const char* ssid = "Shashon";
@@ -36,8 +37,7 @@ void setup() {
   // Set motor pins as output
   pinMode(motorPin1, OUTPUT);
   pinMode(motorPin2, OUTPUT);
-  //myservo.attach(servoPin);
-
+  myServo.attach(18);
   // Route for motor control
   server.on(apiEndpoint, HTTP_POST, [](AsyncWebServerRequest *request){
     String motorState = request->getParam("state")->value();
@@ -56,7 +56,7 @@ void setup() {
     } else {
       //int num = atoi(motorState);
       int degree = motorState.toInt();
-      //myservo.write(degree);  
+      myServo.write(degree);  
       Serial.println("write to motor " + motorState + " degrees");
     }
     request->send(200, "text/plain", "Motor state: " + motorState);
