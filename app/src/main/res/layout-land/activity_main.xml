@@ -7,10 +7,10 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btnMotorOn"
+        android:id="@+id/backwardButton"
         android:layout_width="141dp"
         android:layout_height="75dp"
-        android:text="ON"
+        android:text="BACKWARD"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.972"
@@ -19,10 +19,10 @@
         app:layout_constraintVertical_bias="0.913" />
 
     <Button
-        android:id="@+id/btnMotorOff"
+        android:id="@+id/forwardButton"
         android:layout_width="141dp"
         android:layout_height="75dp"
-        android:text="OFF"
+        android:text="FORWARD"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.972"
@@ -31,11 +31,11 @@
         app:layout_constraintVertical_bias="0.636" />
 
     <SeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="243dp"
-        android:layout_height="54dp"
+        android:id="@+id/directionSeekBar"
+        android:layout_width="307dp"
+        android:layout_height="90dp"
         android:progress="20"
-        tools:layout_editor_absoluteX="136dp"
-        tools:layout_editor_absoluteY="242dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
