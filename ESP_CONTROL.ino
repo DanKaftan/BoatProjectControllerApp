@@ -3,21 +3,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ESP32Servo.h>
+#include <math.h>
+
 
 Servo myServo;
 
 // Replace with your network credentials
-const char* ssid = "Shashon";
-const char* password = "uzpv4018";
+const char* ssid = "note 17";
+const char* password = "david171717";
 
 // Create an instance of the web server
 AsyncWebServer server(80);
 
 // Motor pins
-const int motorPin1 = 27;
-const int motorPin2 = 26;
+// propeller motor pins
+const int propellerMotorPin1 = 27;
+const int propellerMotorPin2 = 26;
+const int propellerMotorEnablePinL = 35;
+const int propellerMotorEnablePinR = 34;
+int propellorPower = 40;
+
+
+
+// diver motor pins
+const int diverMotorPin1 = 33;
+const int diverMotorPin2 = 32;
+int diverPower = 100;
+
+
+// anchor motor pins
+const int anchorMotorPin1 = 18;
+const int anchorMotorPin2 = 19;
+
+
 int servoDegree;
-int servoPin = 25;
+const int servoPin = 18;
+
 
 // API endpoint path
 const char* apiEndpoint = "/motor";
@@ -35,29 +56,79 @@ void setup() {
   Serial.println("Connected to WiFi");
 
   // Set motor pins as output
-  pinMode(motorPin1, OUTPUT);
-  pinMode(motorPin2, OUTPUT);
-  myServo.attach(18);
+  pinMode(propellerMotorPin1, OUTPUT);
+  pinMode(propellerMotorPin2, OUTPUT);
+  pinMode(diverMotorPin1, OUTPUT);
+  pinMode(diverMotorPin2, OUTPUT);
+  pinMode(anchorMotorPin1, OUTPUT);
+  pinMode(anchorMotorPin2, OUTPUT);
+  pinMode(propellerMotorEnablePinL, OUTPUT);
+  pinMode(propellerMotorEnablePinR, OUTPUT);
+
+
+
+  myServo.attach(servoPin);
+
   // Route for motor control
   server.on(apiEndpoint, HTTP_POST, [](AsyncWebServerRequest *request){
     String motorState = request->getParam("state")->value();
     if (motorState == "forward") {
-      digitalWrite(motorPin1, HIGH);
-      digitalWrite(motorPin2, LOW);
+      digitalWrite(propellerMotorPin1, HIGH);
+      digitalWrite(propellerMotorPin2, 50);
       Serial.println("MOTOR FORWARD");
     } else if (motorState == "stop") {
-      digitalWrite(motorPin1, LOW);
-      digitalWrite(motorPin2, LOW);
+      digitalWrite(propellerMotorPin1, LOW);
+      digitalWrite(propellerMotorPin2, LOW);
       Serial.println("MOTOR STOP");
     } else if (motorState == "backward") {
-      digitalWrite(motorPin1, LOW);
-      digitalWrite(motorPin2, HIGH);
+      digitalWrite(propellerMotorPin1, LOW);
+      digitalWrite(propellerMotorPin2, HIGH);
       Serial.println("MOTOR BACKWARD");
+    } else if (motorState == "AnchorUpPressed") { //Anchor Up
+      digitalWrite(anchorMotorPin1, LOW);
+      digitalWrite(anchorMotorPin2, HIGH);
+      Serial.println("Anchor Motor Up");
+    } else if (motorState == "AnchorDownPressed") { //Anchor Up
+      digitalWrite(anchorMotorPin1, LOW);
+      digitalWrite(anchorMotorPin2, HIGH);
+      Serial.println("Anchor Motor Down");
+    }else if (motorState == "AnchorReleased") { //Anchor Up
+      digitalWrite(anchorMotorPin1, LOW);
+      digitalWrite(anchorMotorPin2, LOW);
+      Serial.println("Anchor Motor Down");
+    }  else if (motorState == "DiveUpPressed") { //Anchor Up
+      digitalWrite(diverMotorPin1, LOW);
+      digitalWrite(diverMotorPin2, diverPower);
+      Serial.println("Dive Motor Up");
+    } else if (motorState == "DiveDownPressed") { //Anchor Up
+      digitalWrite(diverMotorPin1, diverPower);
+      digitalWrite(diverMotorPin2, LOW);
+      Serial.println("Dive Motor Down");
+    }else if (motorState == "DiveReleased") { //Anchor Up
+      digitalWrite(diverMotorPin1, LOW);
+      digitalWrite(diverMotorPin2, LOW);
+      Serial.println("Dive Motor Down");
     } else {
+
+     
       //int num = atoi(motorState);
-      int degree = motorState.toInt();
-      myServo.write(degree);  
-      Serial.println("write to motor " + motorState + " degrees");
+      //int degree = motorState.toInt();
+      float degree = motorState.toFloat();
+
+       if (getDecimal(degree) == 3){
+        propellorPower = floor(degree);
+        Serial.println("propellor power: " + propellorPower);
+
+
+      } else if (getDecimal(degree) == 4){
+          diverPower = floor(degree);
+          Serial.println("diver power: " + diverPower);
+
+      } else {
+        myServo.write(degree);  
+        Serial.println("write to motor " + motorState + " degrees");
+      }
+      
     }
     request->send(200, "text/plain", "Motor state: " + motorState);
   });
@@ -89,6 +160,10 @@ void setup() {
 
   // Start the server
   server.begin();
+}
+
+float getDecimal(float num){
+  return (num - floor(num)) * 10;
 }
 
 void loop() {
